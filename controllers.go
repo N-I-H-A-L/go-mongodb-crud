@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -127,4 +128,35 @@ func updateProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Return the updated document as JSON response
 	json.NewEncoder(w).Encode(result)
+}
+
+func deleteProfile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get parameter value as string
+	params := mux.Vars(r)["id"]
+
+	// Convert params to MongoDB Hex ID
+	_id, err := primitive.ObjectIDFromHex(params)
+	if err != nil {
+		fmt.Print(err.Error())
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	// Specify options for deletion, if needed
+	opts := options.Delete().SetCollation(&options.Collation{
+		Locale: "en", // Example locale, specify as needed
+	})
+
+	// Perform the delete operation
+	res, err := userCollection.DeleteOne(context.TODO(), bson.D{{Key: "_id", Value: _id}}, opts)
+	if err != nil {
+		log.Fatal(err)
+		http.Error(w, "Failed to delete document", http.StatusInternalServerError)
+		return
+	}
+
+	// Return the number of documents deleted
+	json.NewEncoder(w).Encode(res.DeletedCount)
 }
