@@ -16,7 +16,7 @@ func main() {
 	fmt.Println("here")
 	s.HandleFunc("/createProfile", CreateProfile).Methods("POST")
 	// s.HandleFunc("/getAllUsers", getAllUsers).Methods("GET")
-	// s.HandleFunc("/getUserProfile", getUserProfile).Methods("POST")
+	s.HandleFunc("/getUserProfile", getUserProfile).Methods("POST")
 	// s.HandleFunc("/updateProfile", updateProfile).Methods("PUT")
 	// s.HandleFunc("/deleteProfile/{id}", deleteProfile).Methods("DELETE")
 
